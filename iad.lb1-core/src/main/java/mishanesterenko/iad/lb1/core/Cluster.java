@@ -8,9 +8,15 @@ import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 
 public class Cluster {
 	private List<Vector> clusteredVectors;
+	private Vector centroid;
 
-	public Cluster(List<Vector> initialVectors) {
+	public Cluster(Vector centroid) {
+		this(new ArrayList<Vector>(), centroid);
+	}
+	
+	public Cluster(List<Vector> initialVectors, Vector centroid) {
 		setClusteredVectors(new ArrayList<Vector>(initialVectors));
+		
 	}
 
 	public List<Vector> getClusteredVectors() {
@@ -19,5 +25,13 @@ public class Cluster {
 
 	private void setClusteredVectors(List<Vector> clusteredVectors) {
 		this.clusteredVectors = clusteredVectors;
+	}
+
+	public Vector getCentroid() {
+		return centroid;
+	}
+
+	public void setCentroid(Vector centroid) {
+		this.centroid = centroid;
 	}
 }

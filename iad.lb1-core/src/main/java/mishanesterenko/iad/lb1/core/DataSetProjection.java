@@ -69,6 +69,11 @@ public class DataSetProjection extends AbstractDataSet {
 	}
 
 	@Override
+	public void setValueAt(int row, int col, double newValue) {
+		getUnderlyingDataset().setValueAt(row, getSelectedIndices()[col], newValue);
+	}
+
+	@Override
 	public int getCardinalityAt(int row) {
 		return getCardinality();
 	}
@@ -115,6 +120,11 @@ public class DataSetProjection extends AbstractDataSet {
 
 		private void setWrappedVector(Vector wrappedVector) {
 			this.wrappedVector = wrappedVector;
+		}
+
+		@Override
+		public void setValue(int index, double newValue) {
+			getWrappedVector().setValue(getSelectedIndices()[index], newValue);
 		}
 	}
 

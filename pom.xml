@@ -15,7 +15,6 @@
   </properties>
   <modules>
   	<module>iad.lb1-core</module>
-  	<module>iad.lb1-plugin</module>
   	<module>iad.lb1-std-plugins</module>
   	<module>iad.lb1-ui-swing</module>
   </modules>

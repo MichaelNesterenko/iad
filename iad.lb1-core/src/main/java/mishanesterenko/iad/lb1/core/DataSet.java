@@ -94,6 +94,11 @@ public class DataSet extends AbstractDataSet {
 	}
 
 	@Override
+	public void setValueAt(int row, int col, double newValue) {
+		getDataSet().get(row)[col] = newValue;
+	}
+
+	@Override
 	public int getCardinalityAt(int row) {
 		return getDataSet().get(row).length;
 	}
@@ -105,12 +110,19 @@ public class DataSet extends AbstractDataSet {
 			mRow = row;
 		}
 
+		@Override
 		public double getValue(int index) {
 			return getValueAt(mRow, index);
 		}
 
+		@Override
 		public int getCardinality() {
 			return getCardinalityAt(mRow);
+		}
+
+		@Override
+		public void setValue(int index, double newValue) {
+			setValueAt(mRow, index, newValue);
 		}
 	}
 

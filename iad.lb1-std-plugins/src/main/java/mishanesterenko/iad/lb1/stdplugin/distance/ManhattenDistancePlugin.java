@@ -11,7 +11,7 @@ public class ManhattenDistancePlugin implements DistanceFunction {
 		double distance = 0;
 		int dimCount = v1.getCardinality();
 		for (int valInd = 0; valInd < dimCount; ++valInd) {
-			distance += Math.abs(v1.getValue(valInd)) - Math.abs(v2.getValue(valInd));
+			distance += Math.abs(v1.getValue(valInd) - v2.getValue(valInd));
 		}
 		return distance;
 	}

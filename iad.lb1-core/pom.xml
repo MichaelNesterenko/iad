@@ -12,4 +12,6 @@
 	<artifactId>iad.lb1-core</artifactId>
 	<name>iad.lb1-core</name>
 
+	<dependencies>
+	</dependencies>
 </project>

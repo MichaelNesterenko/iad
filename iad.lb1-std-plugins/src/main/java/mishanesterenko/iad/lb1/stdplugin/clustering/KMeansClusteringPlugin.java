@@ -12,7 +12,7 @@ import mishanesterenko.iad.lb1.core.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringAlgorithm;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
-public class KMeansClustering implements ClusteringAlgorithm {
+public class KMeansClusteringPlugin implements ClusteringAlgorithm {
 	public static final double CONVERGE_EPSILON = 0.0000001;
 
 	public String getName() {
@@ -23,6 +23,9 @@ public class KMeansClustering implements ClusteringAlgorithm {
 			List<Vector> clusterCentroids) throws ClusteringProcessingException {
 		if (clusterCentroids != null && clusterCount != clusterCentroids.size()) {
 			throw new IllegalArgumentException("clusterCount differs from clusterCentroids.size()");
+		}
+		if (dataSet.size() < clusterCount) {
+			throw new IllegalArgumentException("clusterCount is bigger tham count of vectors");
 		}
 
 		List<Cluster> clusters = new ArrayList<Cluster>(clusterCount);

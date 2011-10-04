@@ -3,13 +3,13 @@ package mishanesterenko.iad.lb1.core.clustering;
 import java.util.ArrayList;
 import java.util.List;
 
-import mishanesterenko.iad.lb1.core.AbstractDataSet;
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.Cluster;
 import mishanesterenko.iad.lb1.core.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.DataSet;
 import mishanesterenko.iad.lb1.core.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringAlgorithm;
+import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
 public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
@@ -19,17 +19,16 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 		return "K-Means clustering";
 	}
 
-	public List<Cluster> clusterVectors(final DataSet dataSet, final DistanceFunction distanceFunction, final int clusterCount,
-			List<Vector> clusterCentroids) throws ClusteringProcessingException {
-		if (clusterCentroids != null && clusterCount != clusterCentroids.size()) {
-			throw new IllegalArgumentException("clusterCount differs from clusterCentroids.size()");
-		}
-		if (dataSet.size() < clusterCount) {
-			throw new IllegalArgumentException("clusterCount is bigger tham count of vectors");
+	public List<Cluster> clusterVectors(final DataSet dataSet, final ClusteringConfiguration conf) throws ClusteringProcessingException {
+		KMeansConfiguration kmeansConf = (KMeansConfiguration)conf;
+		List<Vector> clusterCentroids = kmeansConf.getCentroids();
+
+		if (dataSet.size() < clusterCentroids.size()) {
+			throw new IllegalArgumentException("clusterCount is bigger than count of vectors");
 		}
 
-		List<Cluster> clusters = new ArrayList<Cluster>(clusterCount);
-		clusters = initializeClusters(dataSet, clusters, clusterCentroids, clusterCount);
+		List<Cluster> clusters = new ArrayList<Cluster>(clusterCentroids.size());
+		clusters = initializeClusters(clusters, clusterCentroids);
 
 		/*
 		 * Clustering process.
@@ -37,9 +36,12 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 		 * either randomly computer or received from formal parameter
 		 */
 		try {
-			int dimCount = dataSet.getMinCardinality();
+			final int dimCount = dataSet.getMinCardinality();
+			final int clusterCount = clusterCentroids.size();
+			final DistanceFunction df = kmeansConf.getDistanceFunction();
+
 			while (true) {
-				assignClusters(dataSet, clusters, distanceFunction);
+				assignClusters(dataSet, clusters, df);
 				recomputeMeans(clusters);
 				
 				//checking if solution has converged
@@ -88,42 +90,12 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 
 	}
 
-	private List<Cluster> initializeClusters(DataSet dataSet, List<Cluster> clusters, List<Vector> clusterCentroids, int clusterCount) {
-		if (clusterCentroids == null) {
-			clusterCentroids = new ArrayList<Vector>(clusterCount);
-
-			int dimCount = dataSet.getMinCardinality();
-			double []min = new double[dimCount];
-			double []max = new double[dimCount];
-			// min max initialization
-			{
-				for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
-					min[dimInd] = Double.MAX_VALUE;
-					max[dimInd] = Double.MIN_VALUE;
-				}
-				for (Vector vec : dataSet) {
-					for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
-						double val = vec.getValue(dimInd);
-						if (val < min[dimInd]) {
-							min[dimInd] = val;
-						}
-						if (val > max[dimInd]) {
-							max[dimInd] = val;
-						}
-					}
-				}
-			}
-			Vector centroid = new AbstractDataSet.DetachedVector(dimCount);
-			for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
-				double dimVal = min[dimInd] + (max[dimInd] - min[dimInd]) * Math.random();
-				centroid.setValue(dimInd, dimVal);
-			}
-		}
+	private List<Cluster> initializeClusters(List<Cluster> clusters, List<Vector> clusterCentroids) {
+		int clusterCount = clusterCentroids.size();
 
 		if (clusters == null) {
 			clusters = new ArrayList<Cluster>(clusterCount);
 		}
-
 		for (int clusterInd = 0; clusterInd < clusterCount; ++clusterInd) {
 			clusters.add(new Cluster(clusterCentroids.get(clusterInd)));
 		}

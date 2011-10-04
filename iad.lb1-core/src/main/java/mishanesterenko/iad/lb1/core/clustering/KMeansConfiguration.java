@@ -21,7 +21,11 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 
 	public KMeansConfiguration(List<Vector> centroids, DistanceFunction distanceFunction) {
 		super(distanceFunction);
-		setCentroids(centroids);
+		List<Vector> cntrds = new ArrayList<Vector>(centroids.size());
+		for (Vector vec : centroids) {
+			cntrds.add(vec.detach());
+		}
+		setCentroids(cntrds);
 	}
 
 	protected void initializeCentroids(List<Vector> centroids, int centroidCount, DataSet dataSet) {

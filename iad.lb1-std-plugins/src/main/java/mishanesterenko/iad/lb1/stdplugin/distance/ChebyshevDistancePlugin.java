@@ -1,9 +1,11 @@
 package mishanesterenko.iad.lb1.stdplugin.distance;
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import mishanesterenko.iad.lb1.core.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
+@PluginImplementation
 public class ChebyshevDistancePlugin implements DistanceFunction {
 
 	public double computeDistance(Vector v1, Vector v2) throws VectorDimensionMismatch {

@@ -2,7 +2,6 @@ package mishanesterenko.iad.lb1.core.plugin;
 
 import java.util.List;
 
-import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.Cluster;
 import mishanesterenko.iad.lb1.core.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.DataSet;
@@ -37,6 +36,6 @@ public interface ClusteringAlgorithm {
 	 *            process.
 	 * @return
 	 */
-	public List<Cluster> clusterVectors(DataSet dataSet, DistanceFunction distanceFunction, int clusterCount,
-			List<Vector> clusterCentroids) throws ClusteringProcessingException;
+	public List<Cluster> clusterVectors(DataSet dataSet, ClusteringConfiguration configuration) throws ClusteringProcessingException;
+			//DistanceFunction distanceFunction, int clusterCount, List<Vector> clusterCentroids
 }

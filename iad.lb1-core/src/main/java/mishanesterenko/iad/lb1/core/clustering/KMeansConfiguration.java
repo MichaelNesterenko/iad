@@ -7,6 +7,7 @@ import java.util.List;
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.DataSet;
 import mishanesterenko.iad.lb1.core.DetachedVector;
+import mishanesterenko.iad.lb1.core.UnmodifyableVector;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
@@ -23,7 +24,7 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 		super(distanceFunction);
 		List<Vector> cntrds = new ArrayList<Vector>(centroids.size());
 		for (Vector vec : centroids) {
-			cntrds.add(vec.detach());
+			cntrds.add(new UnmodifyableVector(vec.detach()));
 		}
 		setCentroids(cntrds);
 	}
@@ -50,10 +51,13 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 				}
 			}
 		}
-		Vector centroid = new DetachedVector(dimCount);
-		for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
-			double dimVal = min[dimInd] + (max[dimInd] - min[dimInd]) * Math.random();
-			centroid.setValue(dimInd, dimVal);
+		for (int centroidInd = 0; centroidInd < centroidCount; ++centroidInd) {
+			Vector centroid = new DetachedVector(dimCount);
+			for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
+				double dimVal = min[dimInd] + (max[dimInd] - min[dimInd]) * Math.random();
+				centroid.setValue(dimInd, dimVal);
+			}
+			centroids.add(new UnmodifyableVector(centroid));
 		}
 	}
 

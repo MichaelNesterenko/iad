@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.Iterator;
 
+import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
+
 public abstract class AbstractDataSet  implements Iterable<AbstractDataSet.Vector> {
 	public abstract void load(Reader readerSource) throws IOException, ParseException;
 	public abstract void load(Reader readerSource, String regexSeparator, char decimalSeparator) throws IOException, ParseException;
@@ -46,37 +48,6 @@ public abstract class AbstractDataSet  implements Iterable<AbstractDataSet.Vecto
 			for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
 				setValue(dimInd, other.getValue(dimInd));
 			}
-		}
-	}
-
-	public static class DetachedVector extends Vector {
-		private double[] values;
-
-		public DetachedVector(int dimensionCount) {
-			values = new double[dimensionCount];
-		}
-
-		public DetachedVector(Vector vector) {
-			int dimCount = vector.getCardinality();
-			values = new double[dimCount];
-			for (int valInd = 0; valInd < dimCount; ++valInd) {
-				values[valInd] = vector.getValue(valInd);
-			}
-		}
-
-		@Override
-		public double getValue(int index) {
-			return values[index];
-		}
-
-		@Override
-		public void setValue(int index, double newValue) {
-			values[index] = newValue;
-		}
-
-		@Override
-		public int getCardinality() {
-			return values.length;
 		}
 	}
 

@@ -1,7 +1,7 @@
 package mishanesterenko.iad.lb1.core.plugin;
 
-import mishanesterenko.iad.lb1.core.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
+import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
 
 public interface DistanceFunction {
 	/**

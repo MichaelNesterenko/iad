@@ -3,8 +3,8 @@ package mishanesterenko.iad.lb1.core.clustering;
 import java.util.List;
 
 import mishanesterenko.iad.lb1.core.Cluster;
-import mishanesterenko.iad.lb1.core.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.exception.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringAlgorithm;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 

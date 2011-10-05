@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
-import mishanesterenko.iad.lb1.core.AbstractDataSet;
 import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.DetachedVector;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
@@ -50,7 +50,7 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 				}
 			}
 		}
-		Vector centroid = new AbstractDataSet.DetachedVector(dimCount);
+		Vector centroid = new DetachedVector(dimCount);
 		for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
 			double dimVal = min[dimInd] + (max[dimInd] - min[dimInd]) * Math.random();
 			centroid.setValue(dimInd, dimVal);

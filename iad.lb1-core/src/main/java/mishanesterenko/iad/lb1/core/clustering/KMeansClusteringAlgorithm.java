@@ -5,9 +5,9 @@ import java.util.List;
 
 import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.Cluster;
-import mishanesterenko.iad.lb1.core.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.DataSet;
-import mishanesterenko.iad.lb1.core.VectorDimensionMismatch;
+import mishanesterenko.iad.lb1.core.exception.ClusteringProcessingException;
+import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringAlgorithm;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;

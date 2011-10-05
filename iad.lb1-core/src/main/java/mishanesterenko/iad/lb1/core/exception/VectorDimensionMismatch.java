@@ -1,4 +1,4 @@
-package mishanesterenko.iad.lb1.core;
+package mishanesterenko.iad.lb1.core.exception;
 
 public class VectorDimensionMismatch extends Exception {
 

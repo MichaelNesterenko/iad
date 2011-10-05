@@ -14,19 +14,27 @@ import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 public class KMeansConfiguration extends ClusteringConfiguration {
 	private List<Vector> m_centroids;
 
-	public KMeansConfiguration(int centroidCount, DataSet dataSet, DistanceFunction distanceFunction) {
+	public KMeansConfiguration(int clusterCount, DataSet dataSet, DistanceFunction distanceFunction) {
 		super(distanceFunction);
-		setCentroids(new ArrayList<Vector>(centroidCount));
-		initializeCentroids(intGetCentroids(), centroidCount, dataSet);
+		setCentroids(new ArrayList<Vector>(clusterCount));
+		initializeCentroids(intGetCentroids(), clusterCount, dataSet);
 	}
 
 	public KMeansConfiguration(List<Vector> centroids, DistanceFunction distanceFunction) {
+		this(centroids, true, distanceFunction);
+	}
+
+	public KMeansConfiguration(List<Vector> centroids, boolean doCopyCentroids, DistanceFunction distanceFunction) {
 		super(distanceFunction);
-		List<Vector> cntrds = new ArrayList<Vector>(centroids.size());
-		for (Vector vec : centroids) {
-			cntrds.add(new UnmodifyableVector(vec.detach()));
+		if (doCopyCentroids) {
+			List<Vector> cntrds = new ArrayList<Vector>(centroids.size());
+			for (Vector vec : centroids) {
+				cntrds.add(new UnmodifyableVector(vec.detach()));
+			}
+			setCentroids(cntrds);
+		} else {
+			setCentroids(centroids);
 		}
-		setCentroids(cntrds);
 	}
 
 	protected void initializeCentroids(List<Vector> centroids, int centroidCount, DataSet dataSet) {
@@ -69,7 +77,7 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 		return Collections.unmodifiableList(intGetCentroids());
 	}
 
-	public void setCentroids(List<Vector> m_centroids) {
+	protected void setCentroids(List<Vector> m_centroids) {
 		this.m_centroids = m_centroids;
 	}
 }

@@ -1,14 +1,14 @@
 package mishanesterenko.iad.lb1.core.clustering;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
 public class KMedoidsConfiguration extends ClusteringConfiguration {
-	private List<Integer> m_indices;
+	private Set<Integer> m_indices;
 
 	public KMedoidsConfiguration(int dataSetSize, int clusterCount, DistanceFunction distanceFunction) {
 		super(distanceFunction);
@@ -22,7 +22,7 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 			throw new IllegalArgumentException("cluset count can not be more than data set size");
 		}
 
-		List<Integer> inds = new ArrayList<Integer>(clusterCount);
+		Set<Integer> inds = new HashSet<Integer>(clusterCount);
 		while (clusterCount-- > 0) {
 			int ind = (int) Math.round(Math.random()*clusterCount);
 			inds.add(ind);
@@ -30,10 +30,10 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 		setIndices(inds);
 	}
 
-	public KMedoidsConfiguration(List<Integer> indices, boolean doCopyStorage, DistanceFunction distanceFunction) {
+	public KMedoidsConfiguration(Set<Integer> indices, boolean doCopyStorage, DistanceFunction distanceFunction) {
 		super(distanceFunction);
 		if (doCopyStorage) {
-			List<Integer> inds = new ArrayList<Integer>(indices.size());
+			Set<Integer> inds = new HashSet<Integer>(indices.size());
 			for (Integer ind : indices) {
 				inds.add(ind);
 			}
@@ -43,19 +43,19 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 		}
 	}
 
-	public KMedoidsConfiguration(List<Integer> indices, DistanceFunction distanceFunction) {
+	public KMedoidsConfiguration(Set<Integer> indices, DistanceFunction distanceFunction) {
 		this(indices, true, distanceFunction);
 	}
 
-	protected List<Integer> internalGetIndices() {
+	protected Set<Integer> internalGetIndices() {
 		return m_indices;
 	}
 
-	protected void setIndices(List<Integer> indices) {
+	protected void setIndices(Set<Integer> indices) {
 		m_indices = indices;
 	}
 	
-	public List<Integer> getIndices() {
-		return Collections.unmodifiableList(internalGetIndices());
+	public Set<Integer> getIndices() {
+		return Collections.unmodifiableSet(internalGetIndices());
 	}
 }

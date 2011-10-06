@@ -4,21 +4,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import mishanesterenko.iad.lb1.core.DataSet;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
 public class KMedoidsConfiguration extends ClusteringConfiguration {
 	private Set<Integer> m_indices;
 
-	public KMedoidsConfiguration(int dataSetSize, int clusterCount, DistanceFunction distanceFunction) {
-		super(distanceFunction);
-		if (dataSetSize <= 0) {
-			throw new IllegalArgumentException("data set size can not be less or equal to zero");
-		}
+	public KMedoidsConfiguration(DataSet dataSet, int clusterCount, DistanceFunction distanceFunction) {
+		super(dataSet, distanceFunction);
 		if (clusterCount <= 0) {
 			throw new IllegalArgumentException("cluster count can not be less or equal to zero");
 		}
-		if (clusterCount > dataSetSize) {
+		if (clusterCount > dataSet.size()) {
 			throw new IllegalArgumentException("cluset count can not be more than data set size");
 		}
 
@@ -30,8 +28,8 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 		setIndices(inds);
 	}
 
-	public KMedoidsConfiguration(Set<Integer> indices, boolean doCopyStorage, DistanceFunction distanceFunction) {
-		super(distanceFunction);
+	public KMedoidsConfiguration(DataSet dataSet, Set<Integer> indices, boolean doCopyStorage, DistanceFunction distanceFunction) {
+		super(dataSet, distanceFunction);
 		if (doCopyStorage) {
 			Set<Integer> inds = new HashSet<Integer>(indices.size());
 			for (Integer ind : indices) {
@@ -43,8 +41,8 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 		}
 	}
 
-	public KMedoidsConfiguration(Set<Integer> indices, DistanceFunction distanceFunction) {
-		this(indices, true, distanceFunction);
+	public KMedoidsConfiguration(DataSet dataSet, Set<Integer> indices, DistanceFunction distanceFunction) {
+		this(dataSet, indices, true, distanceFunction);
 	}
 
 	protected Set<Integer> internalGetIndices() {

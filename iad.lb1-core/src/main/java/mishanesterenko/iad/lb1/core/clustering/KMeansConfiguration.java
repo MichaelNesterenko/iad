@@ -15,17 +15,17 @@ public class KMeansConfiguration extends ClusteringConfiguration {
 	private List<Vector> m_centroids;
 
 	public KMeansConfiguration(int clusterCount, DataSet dataSet, DistanceFunction distanceFunction) {
-		super(distanceFunction);
+		super(dataSet, distanceFunction);
 		setCentroids(new ArrayList<Vector>(clusterCount));
 		initializeCentroids(intGetCentroids(), clusterCount, dataSet);
 	}
 
-	public KMeansConfiguration(List<Vector> centroids, DistanceFunction distanceFunction) {
-		this(centroids, true, distanceFunction);
+	public KMeansConfiguration(DataSet dataSet, List<Vector> centroids, DistanceFunction distanceFunction) {
+		this(dataSet, centroids, true, distanceFunction);
 	}
 
-	public KMeansConfiguration(List<Vector> centroids, boolean doCopyCentroids, DistanceFunction distanceFunction) {
-		super(distanceFunction);
+	public KMeansConfiguration(DataSet dataSet, List<Vector> centroids, boolean doCopyCentroids, DistanceFunction distanceFunction) {
+		super(dataSet, distanceFunction);
 		if (doCopyCentroids) {
 			List<Vector> cntrds = new ArrayList<Vector>(centroids.size());
 			for (Vector vec : centroids) {

@@ -19,8 +19,9 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 		return "K-Means clustering";
 	}
 
-	public List<Cluster> clusterVectors(final DataSet dataSet, final ClusteringConfiguration conf) throws ClusteringProcessingException {
+	public List<Cluster> clusterVectors(final ClusteringConfiguration conf) throws ClusteringProcessingException {
 		KMeansConfiguration kmeansConf = (KMeansConfiguration)conf;
+		DataSet dataSet = kmeansConf.getDataSet();
 		List<Vector> clusterCentroids = kmeansConf.getCentroids();
 
 		if (dataSet.size() < clusterCentroids.size()) {

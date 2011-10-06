@@ -20,9 +20,10 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 		return "K-Medoids clustering";
 	}
 
-	public List<Cluster> clusterVectors(DataSet dataSet, ClusteringConfiguration conf) throws ClusteringProcessingException {
+	public List<Cluster> clusterVectors(ClusteringConfiguration conf) throws ClusteringProcessingException {
 		try {
 			KMedoidsConfiguration kMedoidsConf = (KMedoidsConfiguration) conf;
+			DataSet dataSet = kMedoidsConf.getDataSet();
 			DistanceFunction df = kMedoidsConf.getDistanceFunction();
 			Set<Integer> indices = kMedoidsConf.getIndices();
 			List<Cluster> clusters = initializeClusters(indices, dataSet, df);

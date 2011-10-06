@@ -15,15 +15,14 @@ public class Cluster {
 	}
 	
 	public Cluster(List<Vector> initialVectors, Vector centroid) {
-		setClusteredVectors(new ArrayList<Vector>(initialVectors));
-		
+		setClusteredVectors(initialVectors);
 	}
 
 	public List<Vector> getClusteredVectors() {
 		return clusteredVectors;
 	}
 
-	private void setClusteredVectors(List<Vector> clusteredVectors) {
+	public void setClusteredVectors(List<Vector> clusteredVectors) {
 		this.clusteredVectors = clusteredVectors;
 	}
 
@@ -33,5 +32,24 @@ public class Cluster {
 
 	public void setCentroid(Vector centroid) {
 		this.centroid = centroid;
+	}
+
+	public Cluster clone(boolean cloneVectors) {
+		Cluster newCluster;
+		if (cloneVectors) {
+			List<Vector> newClusteredVectors = new ArrayList<Vector>(getClusteredVectors().size());
+			for (Vector vec : getClusteredVectors()) {
+				newClusteredVectors.add(vec.clone());
+			}
+			newCluster = new Cluster(newClusteredVectors, getCentroid().clone());
+		} else {
+			newCluster = new Cluster(getCentroid().clone());
+		}
+
+		return newCluster;
+	}
+
+	public Cluster clone() {
+		return clone(true);
 	}
 }

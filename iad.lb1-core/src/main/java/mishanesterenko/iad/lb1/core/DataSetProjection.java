@@ -126,6 +126,11 @@ public class DataSetProjection extends AbstractDataSet {
 		public void setValue(int index, double newValue) {
 			getWrappedVector().setValue(getSelectedIndices()[index], newValue);
 		}
+
+		@Override
+		public Vector clone() {
+			return this;
+		}
 	}
 
 	public class VectorIterator extends AbstractDataSet.VectorIterator {

@@ -28,16 +28,36 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 			List<Cluster> clusters = initializeClusters(indices, dataSet, df);
 
 			double cost = Double.MAX_VALUE;
+			List<Cluster> workingClustersCopy = new ArrayList<Cluster>(clusters.size());
+			List<Cluster> possibleEnhancementClustersCopy = new ArrayList<Cluster>(clusters.size());
 			while (true) {
-				assignClusters(clusters, dataSet, df, indices); // we have here medoids set
-
-				for (Cluster cluster : clusters) {
-					medoids.add(cluster.getCentroid());
+				assignClusters(clusters, dataSet, df); // we have here medoids set
+				double tempCost = computeCost(clusters, df);
+				if (tempCost < cost) {
+					cost = tempCost;
+					copyClusters(possibleEnhancementClustersCopy, clusters);
 				}
-				
-				double possibleMinCost = computeCost(clusters, df);
-				if (possibleMinCost < cost) {
-					cost = possibleMinCost;
+
+				boolean foundLess = false;
+				for (Cluster cluster : clusters) {
+					Vector medoid = cluster.getCentroid();
+					for (Vector vec : cluster.getClusteredVectors()) {
+						swapVector(medoid, vec);
+						copyClusters(workingClustersCopy, clusters);
+						swapVector(medoid, vec);
+						
+						assignClusters(workingClustersCopy, dataSet, df);
+						tempCost = computeCost(workingClustersCopy, df);
+						if (tempCost < cost) {
+							cost = tempCost;
+							copyClusters(possibleEnhancementClustersCopy, clusters);
+							foundLess = true;
+						}
+					}
+				}
+
+				if (foundLess) {
+					clusters = possibleEnhancementClustersCopy;
 				} else {
 					break;
 				}
@@ -49,6 +69,13 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 		}
 	}
 
+	protected void copyClusters(List<Cluster> dest, List<Cluster> source) {
+		dest.clear();
+		for(Cluster sourceCluster : source) {
+			dest.add(sourceCluster.clone(false));
+		}
+	}
+	
 	protected double computeCost(List<Cluster> clusters, DistanceFunction df) throws VectorDimensionMismatch {
 		double res = 0;
 		for (Cluster cluster : clusters) {
@@ -73,28 +100,26 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 		return clusters;
 	}
 
-	protected void assignClusters(List<Cluster> clusters, DataSet dataSet, DistanceFunction df, Set<Integer> indices) throws VectorDimensionMismatch {
+	protected void assignClusters(List<Cluster> clusters, DataSet dataSet, DistanceFunction df) throws VectorDimensionMismatch {
 		for (Cluster cluster : clusters) {
 			cluster.getClusteredVectors().clear();
 		}
 
 		int vecCount = dataSet.size();
 		for (int vecInd = 0; vecInd < vecCount; ++vecInd) {
-			if (!indices.contains(vecInd)) {
-				Vector vec = dataSet.get(vecInd);
-				Cluster addTo = null;
-				double dist = Double.MAX_VALUE;
-				for (Cluster cluster : clusters) {
-					Vector centroid = cluster.getCentroid();
-					double d = df.computeDistance(centroid, vec);
-					if (d < dist) {
-						dist = d;
-						addTo = cluster;
-					}
+			Vector vec = dataSet.get(vecInd);
+			Cluster addTo = null;
+			double dist = Double.MAX_VALUE;
+			for (Cluster cluster : clusters) {
+				Vector centroid = cluster.getCentroid();
+				double d = df.computeDistance(centroid, vec);
+				if (d != 0 && d < dist) {
+					dist = d;
+					addTo = cluster;
 				}
-				if (addTo != null) {
-					addTo.getClusteredVectors().add(vec);
-				}
+			}
+			if (addTo != null) {
+				addTo.getClusteredVectors().add(vec);
 			}
 		}
 	}

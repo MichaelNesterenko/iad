@@ -124,6 +124,11 @@ public class DataSet extends AbstractDataSet {
 		public void setValue(int index, double newValue) {
 			setValueAt(mRow, index, newValue);
 		}
+
+		@Override
+		public mishanesterenko.iad.lb1.core.AbstractDataSet.Vector clone() {
+			return this;
+		}
 	}
 
 	public class VectorIterator extends AbstractDataSet.VectorIterator {

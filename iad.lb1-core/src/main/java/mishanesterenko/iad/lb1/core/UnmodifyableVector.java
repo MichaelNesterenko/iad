@@ -27,4 +27,9 @@ public class UnmodifyableVector extends Vector {
 		return wrappedVector.getCardinality();
 	}
 
+	@Override
+	public Vector clone() {
+		return wrappedVector.clone();
+	}
+
 }

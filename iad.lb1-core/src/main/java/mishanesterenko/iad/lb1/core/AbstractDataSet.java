@@ -49,6 +49,8 @@ public abstract class AbstractDataSet  implements Iterable<AbstractDataSet.Vecto
 				setValue(dimInd, other.getValue(dimInd));
 			}
 		}
+
+		public abstract Vector clone();
 	}
 
 	public abstract class VectorIterator implements Iterator<Vector> {

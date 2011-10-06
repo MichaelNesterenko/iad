@@ -31,4 +31,9 @@ public class DetachedVector extends Vector {
 	public int getCardinality() {
 		return values.length;
 	}
+
+	@Override
+	public Vector clone() {
+		return new DetachedVector(this);
+	}
 }

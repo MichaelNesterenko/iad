@@ -41,9 +41,9 @@ public class Cluster {
 			for (Vector vec : getClusteredVectors()) {
 				newClusteredVectors.add(vec.clone());
 			}
-			newCluster = new Cluster(newClusteredVectors, getCentroid().clone());
+			newCluster = new Cluster(newClusteredVectors, getCentroid() != null ? getCentroid().clone() : null);
 		} else {
-			newCluster = new Cluster(getCentroid().clone());
+			newCluster = new Cluster(getCentroid() != null ? getCentroid().clone() : null);
 		}
 
 		return newCluster;

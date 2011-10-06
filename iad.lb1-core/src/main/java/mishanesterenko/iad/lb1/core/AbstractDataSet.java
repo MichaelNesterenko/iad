@@ -51,6 +51,38 @@ public abstract class AbstractDataSet  implements Iterable<AbstractDataSet.Vecto
 		}
 
 		public abstract Vector clone();
+
+		public boolean equals(Vector other) {
+			int dimCount;
+			if ((dimCount = other.getCardinality()) != getCardinality()) {
+				return false;
+			}
+			for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
+				if (getValue(dimInd) != other.getValue(dimInd)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		@Override
+		public final boolean equals(Object other) {
+			if (other instanceof Vector) {
+				return equals((Vector)other);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			long hash = 0;
+			int dimCount = getCardinality();
+			for (int dimInd = 0; dimInd < dimCount; ++dimInd) {
+				hash = 31 * hash + Double.doubleToLongBits(getValue(dimInd));
+			}
+			return (int) hash;
+		}
 	}
 
 	public abstract class VectorIterator implements Iterator<Vector> {

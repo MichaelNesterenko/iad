@@ -27,14 +27,8 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 			throw new IllegalArgumentException("clusterCount is bigger than count of vectors");
 		}
 
-		List<Cluster> clusters = new ArrayList<Cluster>(clusterCentroids.size());
-		clusters = initializeClusters(clusters, clusterCentroids);
+		List<Cluster> clusters = initializeClusters(clusterCentroids);
 
-		/*
-		 * Clustering process.
-		 * PRECONDITION: clusterCentroids contains initial cluster centroids
-		 * either randomly computer or received from formal parameter
-		 */
 		try {
 			final int dimCount = dataSet.getMinCardinality();
 			final int clusterCount = clusterCentroids.size();
@@ -72,6 +66,9 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 	}
 
 	private void assignClusters(DataSet dataSet, List<Cluster> clusters, DistanceFunction distanceFunction) throws VectorDimensionMismatch {
+		for (Cluster cluster : clusters) {
+			cluster.getClusteredVectors().clear();
+		}
 		for (Vector vec : dataSet) {
 			double minDistance = Double.MAX_VALUE;
 			Cluster nearestCluster = null;
@@ -87,15 +84,31 @@ public class KMeansClusteringAlgorithm implements ClusteringAlgorithm {
 	}
 
 	private void recomputeMeans(List<Cluster> clusters) {
-
+		if (clusters.size() > 0) {
+			int dimCount = clusters.get(0).getCentroid().getCardinality();
+			double []newCentroid = new double[dimCount];
+			for (Cluster cluster : clusters) {
+				int vecCount = cluster.getClusteredVectors().size();
+				Vector centroid = cluster.getCentroid();
+				for (Vector vec : cluster.getClusteredVectors()) {
+					for (int cInd = 0; cInd < dimCount; ++cInd) {
+						newCentroid[cInd] += vec.getValue(cInd);
+					}
+				}
+				for (int cInd = 0; cInd < dimCount; ++cInd) {
+					newCentroid[cInd] /= vecCount;
+					centroid.setValue(cInd, newCentroid[cInd]);
+					newCentroid[cInd] = 0;
+				}
+			}
+		}
 	}
 
-	private List<Cluster> initializeClusters(List<Cluster> clusters, List<Vector> clusterCentroids) {
+	private List<Cluster> initializeClusters(List<Vector> clusterCentroids) {
 		int clusterCount = clusterCentroids.size();
 
-		if (clusters == null) {
-			clusters = new ArrayList<Cluster>(clusterCount);
-		}
+		List<Cluster> clusters = new ArrayList<Cluster>(clusterCount);
+		
 		for (int clusterInd = 0; clusterInd < clusterCount; ++clusterInd) {
 			clusters.add(new Cluster(clusterCentroids.get(clusterInd)));
 		}

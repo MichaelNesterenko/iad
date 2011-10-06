@@ -1,4 +1,4 @@
-package mishanesterenko.iad.lb1.core.clustering;
+package mishanesterenko.iad.lb1.core.clustering.kmeans;
 
 import java.util.ArrayList;
 import java.util.List;

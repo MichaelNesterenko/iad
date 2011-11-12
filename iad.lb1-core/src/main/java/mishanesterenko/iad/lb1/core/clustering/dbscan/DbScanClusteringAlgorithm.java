@@ -32,6 +32,9 @@ public class DbScanClusteringAlgorithm implements ClusteringAlgorithm {
 
 		try {
 			for (Vector vec : dbScanConfig.getDataSet()) {
+				if (visited.contains(vec)) {
+					continue;
+				}
 				List<Vector> neibhours = getNeighbours(dataSet, df, vec, eps);
 				if (neibhours.size() < minCount) {
 					noise.add(vec);
@@ -54,15 +57,15 @@ public class DbScanClusteringAlgorithm implements ClusteringAlgorithm {
 		List<Vector> clusteredVectors = cluster.getClusteredVectors();
 		clusteredVectors.add(firstPoint);
 
-		for (Vector neigbhour : neighbours) {
-			if (noise.contains(neigbhour)) {
-				clusteredVectors.add(neigbhour);
-				noise.remove(neigbhour);
-				visited.add(neigbhour);
+		for (Vector neighbour : neighbours) {
+			if (noise.contains(neighbour)) {
+				clusteredVectors.add(neighbour);
+				noise.remove(neighbour);
+				visited.add(neighbour);
 			} else {
-				List<Vector> moreNeighbours = getNeighbours(dataSet, df, neigbhour, eps);
+				List<Vector> moreNeighbours = getNeighbours(dataSet, df, neighbour, eps);
 				if (moreNeighbours.size() >= minCount) {
-					expandCluster(dataSet, cluster, neigbhour, moreNeighbours, df, eps, minCount, visited, noise);
+					expandCluster(dataSet, cluster, neighbour, moreNeighbours, df, eps, minCount, visited, noise);
 				}
 			}
 		}

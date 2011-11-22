@@ -3,18 +3,17 @@ package mishanesterenko.iad.lb1.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
+import mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector;
 
 
-public class Cluster {
+public class Cluster implements Cloneable {
 	private List<Vector> clusteredVectors;
-	private Vector centroid;
 
-	public Cluster(Vector centroid) {
-		this(new ArrayList<Vector>(), centroid);
+	public Cluster() {
+		this(new ArrayList<Vector>());
 	}
 	
-	public Cluster(List<Vector> initialVectors, Vector centroid) {
+	public Cluster(List<Vector> initialVectors) {
 		setClusteredVectors(initialVectors);
 	}
 
@@ -26,14 +25,6 @@ public class Cluster {
 		this.clusteredVectors = clusteredVectors;
 	}
 
-	public Vector getCentroid() {
-		return centroid;
-	}
-
-	public void setCentroid(Vector centroid) {
-		this.centroid = centroid;
-	}
-
 	public Cluster clone(boolean cloneVectors) {
 		Cluster newCluster;
 		if (cloneVectors) {
@@ -41,9 +32,23 @@ public class Cluster {
 			for (Vector vec : getClusteredVectors()) {
 				newClusteredVectors.add(vec.clone());
 			}
-			newCluster = new Cluster(newClusteredVectors, getCentroid() != null ? getCentroid().clone() : null);
+			try {
+				newCluster = (Cluster) super.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new IllegalStateException();
+			}
+			newCluster.setClusteredVectors(newClusteredVectors);
 		} else {
-			newCluster = new Cluster(getCentroid() != null ? getCentroid().clone() : null);
+			try {
+				newCluster = (Cluster) super.clone();
+				List<Vector> newVectors = new ArrayList<Vector>(getClusteredVectors().size());
+				for(Vector v : getClusteredVectors()) {
+					newVectors.add(v);
+				}
+				newCluster.setClusteredVectors(newVectors);
+			} catch (CloneNotSupportedException e) {
+				throw new IllegalStateException();
+			}
 		}
 
 		return newCluster;

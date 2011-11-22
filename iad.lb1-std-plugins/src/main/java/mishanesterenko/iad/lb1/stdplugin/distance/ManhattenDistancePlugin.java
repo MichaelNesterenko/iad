@@ -1,7 +1,7 @@
 package mishanesterenko.iad.lb1.stdplugin.distance;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
+import mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 

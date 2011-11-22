@@ -1,12 +1,14 @@
 package mishanesterenko.iad.lb1.core.clustering.kmedoids;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.Cluster;
-import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.clustering.IndexCentroidedCluster;
+import mishanesterenko.iad.lb1.core.dataset.DataSet;
+import mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.exception.ClusteringProcessingException;
 import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringAlgorithm;
@@ -20,17 +22,17 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 		return "K-Medoids clustering";
 	}
 
-	public List<Cluster> clusterVectors(ClusteringConfiguration conf) throws ClusteringProcessingException {
+	public List<? extends Cluster> clusterVectors(ClusteringConfiguration conf) throws ClusteringProcessingException {
 		try {
 			KMedoidsConfiguration kMedoidsConf = (KMedoidsConfiguration) conf;
 			DataSet dataSet = kMedoidsConf.getDataSet();
 			DistanceFunction df = kMedoidsConf.getDistanceFunction();
 			Set<Integer> indices = kMedoidsConf.getIndices();
-			List<Cluster> clusters = initializeClusters(indices, dataSet, df);
+			List<IndexCentroidedCluster> clusters = initializeClusters(indices, dataSet, df);
 
 			double cost = Double.MAX_VALUE;
-			List<Cluster> workingClustersCopy = new ArrayList<Cluster>(clusters.size());
-			List<Cluster> possibleEnhancementClustersCopy = new ArrayList<Cluster>(clusters.size());
+			List<IndexCentroidedCluster> workingClustersCopy = new ArrayList<IndexCentroidedCluster>(clusters.size());
+			List<IndexCentroidedCluster> possibleEnhancementClustersCopy = new ArrayList<IndexCentroidedCluster>(clusters.size());
 			while (true) {
 				assignClusters(clusters, dataSet, df); // we have here medoids set
 				double tempCost = computeCost(clusters, df);
@@ -40,9 +42,14 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 				}
 
 				boolean foundLess = false;
-				for (Cluster cluster : clusters) {
+				Iterator<IndexCentroidedCluster> clusterIterator = clusters.iterator();
+				while (clusterIterator.hasNext()) {
+					IndexCentroidedCluster cluster = clusterIterator.next();
 					Vector medoid = cluster.getCentroid();
-					for (Vector vec : cluster.getClusteredVectors()) {
+					List<Vector> clusteredVectors = cluster.getClusteredVectors();
+					Iterator<Vector> clusteredVectorIterator = clusteredVectors.iterator();
+					while (clusteredVectorIterator.hasNext()) {
+						Vector vec = clusteredVectorIterator.next();
 						swapVector(medoid, vec);
 						copyClusters(workingClustersCopy, clusters);
 						swapVector(medoid, vec);
@@ -65,21 +72,21 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 			}
 			
 			return clusters;
-		} catch (VectorDimensionMismatch e) {
+		} catch (Exception e) {
 			throw new ClusteringProcessingException(e.getMessage(), e);
 		}
 	}
 
-	protected void copyClusters(List<Cluster> dest, List<Cluster> source) {
+	protected void copyClusters(List<IndexCentroidedCluster> dest, List<IndexCentroidedCluster> source) {
 		dest.clear();
-		for(Cluster sourceCluster : source) {
+		for(IndexCentroidedCluster sourceCluster : source) {
 			dest.add(sourceCluster.clone(false));
 		}
 	}
 	
-	protected double computeCost(List<Cluster> clusters, DistanceFunction df) throws VectorDimensionMismatch {
+	protected double computeCost(List<IndexCentroidedCluster> clusters, DistanceFunction df) throws VectorDimensionMismatch {
 		double res = 0;
-		for (Cluster cluster : clusters) {
+		for (IndexCentroidedCluster cluster : clusters) {
 			Vector centroid = cluster.getCentroid();
 			for (Vector vec : cluster.getClusteredVectors()) {
 				res += df.computeDistance(centroid, vec);
@@ -88,20 +95,20 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 		return res;
 	}
 	
-	protected List<Cluster> initializeClusters(Set<Integer> indices, DataSet dataSet, DistanceFunction df) throws VectorDimensionMismatch {
+	protected List<IndexCentroidedCluster> initializeClusters(Set<Integer> indices, DataSet dataSet, DistanceFunction df) throws VectorDimensionMismatch {
 		int clusterCount = indices.size();
-		List<Cluster> clusters = new ArrayList<Cluster>(clusterCount);
+		List<IndexCentroidedCluster> clusters = new ArrayList<IndexCentroidedCluster>(clusterCount);
 
 		for (Integer clusterInd : indices) {
 			Vector centroid = dataSet.get(clusterInd).detach();
-			Cluster cluster = new Cluster(centroid);
+			IndexCentroidedCluster cluster = new IndexCentroidedCluster(centroid, clusterInd);
 			clusters.add(cluster);
 		}
 
 		return clusters;
 	}
 
-	protected void assignClusters(List<Cluster> clusters, DataSet dataSet, DistanceFunction df) throws VectorDimensionMismatch {
+	protected void assignClusters(List<IndexCentroidedCluster> clusters, DataSet dataSet, DistanceFunction df) throws VectorDimensionMismatch {
 		for (Cluster cluster : clusters) {
 			cluster.getClusteredVectors().clear();
 		}
@@ -111,10 +118,14 @@ public final class KMedoidsClusteringAlgorithm implements ClusteringAlgorithm {
 			Vector vec = dataSet.get(vecInd);
 			Cluster addTo = null;
 			double dist = Double.MAX_VALUE;
-			for (Cluster cluster : clusters) {
+			for (IndexCentroidedCluster cluster : clusters) {
 				Vector centroid = cluster.getCentroid();
+				int centroidIndex = cluster.getCentroidIndex();
+				if (centroidIndex == vecInd) {
+					continue;
+				}
 				double d = df.computeDistance(centroid, vec);
-				if (d != 0 && d < dist) {
+				if (d < dist) {
 					dist = d;
 					addTo = cluster;
 				}

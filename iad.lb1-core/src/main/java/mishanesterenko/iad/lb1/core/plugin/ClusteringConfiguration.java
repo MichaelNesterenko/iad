@@ -1,6 +1,6 @@
 package mishanesterenko.iad.lb1.core.plugin;
 
-import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.dataset.DataSet;
 
 public class ClusteringConfiguration {
 	private DistanceFunction m_distanceFunction;
@@ -23,5 +23,8 @@ public class ClusteringConfiguration {
 
 	public DataSet getDataSet() {
 		return m_dataSet;
+	}
+
+	public void reset() {
 	}
 }

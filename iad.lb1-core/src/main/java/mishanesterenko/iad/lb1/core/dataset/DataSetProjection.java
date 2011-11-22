@@ -1,4 +1,4 @@
-package mishanesterenko.iad.lb1.core;
+package mishanesterenko.iad.lb1.core.dataset;
 
 import java.io.IOException;
 import java.io.Reader;

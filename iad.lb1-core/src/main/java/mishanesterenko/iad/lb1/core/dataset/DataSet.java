@@ -1,4 +1,4 @@
-package mishanesterenko.iad.lb1.core;
+package mishanesterenko.iad.lb1.core.dataset;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import com.sun.beans.WeakCache;
 
 public class DataSet extends AbstractDataSet {
@@ -49,11 +50,13 @@ public class DataSet extends AbstractDataSet {
 			}
 			dataSet.add(dataValues);
 		}
+		mMinCardinality = minCardinality;
+		mMaxCardinality = maxCardinality;
 	}
 
 	@Override
 	public Vector get(int mRow) {
-		Vector v = getCache().get(++mRow);
+		Vector v = getCache().get(mRow);
 		if (v == null) {
 			v = new Vector(mRow);
 			getCache().put(mRow, v);
@@ -85,7 +88,7 @@ public class DataSet extends AbstractDataSet {
 	}
 
 	public Iterator<AbstractDataSet.Vector> iterator() {
-		return (Iterator<AbstractDataSet.Vector>)new VectorIterator();
+		return (Iterator<AbstractDataSet.Vector>) new VectorIterator();
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public class DataSet extends AbstractDataSet {
 		}
 
 		@Override
-		public mishanesterenko.iad.lb1.core.AbstractDataSet.Vector clone() {
+		public mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector clone() {
 			return this;
 		}
 	}
@@ -141,7 +144,7 @@ public class DataSet extends AbstractDataSet {
 		}
 		
 		public Vector next() {
-			Vector v = get(mPos);
+			Vector v = get(++mPos);
 			return v;
 		}
 		

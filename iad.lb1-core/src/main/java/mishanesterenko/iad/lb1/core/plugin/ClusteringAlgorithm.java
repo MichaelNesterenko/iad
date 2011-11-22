@@ -35,6 +35,6 @@ public interface ClusteringAlgorithm {
 	 *            process.
 	 * @return
 	 */
-	public List<Cluster> clusterVectors(ClusteringConfiguration configuration) throws ClusteringProcessingException;
+	public List<? extends Cluster> clusterVectors(ClusteringConfiguration configuration) throws ClusteringProcessingException;
 			//DistanceFunction distanceFunction, int clusterCount, List<Vector> clusterCentroids
 }

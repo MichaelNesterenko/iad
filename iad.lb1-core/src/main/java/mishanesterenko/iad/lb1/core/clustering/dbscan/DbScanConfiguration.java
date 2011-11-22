@@ -1,6 +1,6 @@
 package mishanesterenko.iad.lb1.core.clustering.dbscan;
 
-import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.dataset.DataSet;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 

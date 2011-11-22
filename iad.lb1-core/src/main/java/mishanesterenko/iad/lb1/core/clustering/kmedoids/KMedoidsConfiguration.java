@@ -1,10 +1,12 @@
 package mishanesterenko.iad.lb1.core.clustering.kmedoids;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import mishanesterenko.iad.lb1.core.DataSet;
+import mishanesterenko.iad.lb1.core.dataset.DataSet;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 
@@ -20,11 +22,14 @@ public class KMedoidsConfiguration extends ClusteringConfiguration {
 			throw new IllegalArgumentException("cluset count can not be more than data set size");
 		}
 
-		Set<Integer> inds = new HashSet<Integer>(clusterCount);
-		while (clusterCount-- > 0) {
-			int ind = (int) Math.round(Math.random()*clusterCount);
-			inds.add(ind);
+		List<Integer> indices = new ArrayList<Integer>(dataSet.size());
+		for (int ind = 0; ind < dataSet.size(); ++ind) {
+			indices.add(ind);
 		}
+		while (indices.size() > clusterCount) {
+			indices.remove((int) Math.floor(Math.random() * indices.size()));
+		}
+		Set<Integer> inds = new HashSet<Integer>(indices);
 		setIndices(inds);
 	}
 

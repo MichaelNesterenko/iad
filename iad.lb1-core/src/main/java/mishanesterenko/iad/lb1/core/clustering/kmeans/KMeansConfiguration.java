@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import mishanesterenko.iad.lb1.core.AbstractDataSet.Vector;
-import mishanesterenko.iad.lb1.core.DataSet;
-import mishanesterenko.iad.lb1.core.DetachedVector;
-import mishanesterenko.iad.lb1.core.UnmodifyableVector;
+import mishanesterenko.iad.lb1.core.dataset.DataSet;
+import mishanesterenko.iad.lb1.core.dataset.DetachedVector;
+import mishanesterenko.iad.lb1.core.dataset.UnmodifyableVector;
+import mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 

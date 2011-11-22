@@ -1,4 +1,4 @@
-package mishanesterenko.iad.lb1.core;
+package mishanesterenko.iad.lb1.core.dataset;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import mishanesterenko.iad.lb1.core.exception.VectorDimensionMismatch;
 
-public abstract class AbstractDataSet  implements Iterable<AbstractDataSet.Vector> {
+public abstract class AbstractDataSet implements Iterable<AbstractDataSet.Vector> {
 	public abstract void load(Reader readerSource) throws IOException, ParseException;
 	public abstract void load(Reader readerSource, String regexSeparator, char decimalSeparator) throws IOException, ParseException;
 	public abstract Vector get(int mRow);

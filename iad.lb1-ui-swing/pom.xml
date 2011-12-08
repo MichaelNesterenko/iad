@@ -15,7 +15,6 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jme.version>3.0.0-SNAPSHOT</jme.version>
 	</properties>
 
 	<dependencies>
@@ -26,31 +25,6 @@
 		<dependency>
 			<groupId>mishanesterenko</groupId>
 			<artifactId>iad.lb1-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>jmonkeyengine3</artifactId>
-			<version>${jme.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>lwjgl</artifactId>
-			<version>${jme.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>lwjgl-natives</artifactId>
-			<version>${jme.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>oggd</artifactId>
-			<version>${jme.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jme3</groupId>
-			<artifactId>vorbisd</artifactId>
-			<version>${jme.version}</version>
 		</dependency>
 	</dependencies>
 	

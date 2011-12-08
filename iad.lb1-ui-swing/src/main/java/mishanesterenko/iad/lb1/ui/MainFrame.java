@@ -1,8 +1,9 @@
 package mishanesterenko.iad.lb1.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,19 +11,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.Random;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import com.jme3.system.AppSettings;
-import com.jme3.system.JmeCanvasContext;
 
 import mishanesterenko.iad.lb1.core.Cluster;
 import mishanesterenko.iad.lb1.core.clustering.dbscan.DbScanClusteringAlgorithm;
@@ -31,6 +27,7 @@ import mishanesterenko.iad.lb1.core.clustering.kmeans.KMeansClusteringAlgorithm;
 import mishanesterenko.iad.lb1.core.clustering.kmeans.KMeansConfiguration;
 import mishanesterenko.iad.lb1.core.clustering.kmedoids.KMedoidsClusteringAlgorithm;
 import mishanesterenko.iad.lb1.core.clustering.kmedoids.KMedoidsConfiguration;
+import mishanesterenko.iad.lb1.core.dataset.AbstractDataSet.Vector;
 import mishanesterenko.iad.lb1.core.dataset.DataSet;
 import mishanesterenko.iad.lb1.core.distancefunction.EuclideanDistance;
 import mishanesterenko.iad.lb1.core.distancefunction.EuclideanSquaredDistance;
@@ -40,17 +37,8 @@ import mishanesterenko.iad.lb1.core.plugin.ClusteringConfiguration;
 import mishanesterenko.iad.lb1.core.plugin.DistanceFunction;
 import mishanesterenko.iad.lb1.stdplugin.distance.ChebyshevDistancePlugin;
 import mishanesterenko.iad.lb1.stdplugin.distance.ManhattenDistancePlugin;
-
-import javax.swing.DefaultComboBoxModel;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class MainFrame extends JFrame {
 	/**
@@ -58,23 +46,11 @@ public class MainFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = 667780228063658143L;
 
-	public static final String DATASET_PATH = "/dataset.dat";
-
-	private static final String[] CLUSTERING_ALGORITHM_NAME = new String[] {"K-means", "K-medoids", "Db-scan"};
-	private static final ClusteringAlgorithm[] CLUSTERING_ALGORITHM_IMPLEMENTATION = new ClusteringAlgorithm[CLUSTERING_ALGORITHM_NAME.length];
-	private static final String[] DISTANCE_FUNCTION_NAME = new String[] {"Euclidean", "Euclidean squared", "Manhatten", "Chebyshev"};
-	private static final DistanceFunction[] DISTANCE_FUNCTION_IMPLEMENTATION = new DistanceFunction[DISTANCE_FUNCTION_NAME.length];
-	private final JPanel[] optionPanes = new JPanel[CLUSTERING_ALGORITHM_IMPLEMENTATION.length];
+	public static final String DATASET_PATH = "/dataset_2d.dat";
 
 	private JPanel contentPane;
-	private JButton btnCluster;
 
 	private DataSet dataSet = new DataSet();
-	private ClusteringApplication clusteringApplication;
-	private ClusteringAlgorithm currentClusteringAlgorithm;
-	private DistanceFunction currentDistanceFunction;
-	private ClusteringConfiguration currentClusteringConfiguration;
-	private JPanel currentOptionPane;
 
 	/**
 	 * Launch the application.
@@ -92,197 +68,54 @@ public class MainFrame extends JFrame {
 		});
 	}
 
+	private Random r = new Random();
+
 	/**
 	 * Create the frame.
-	 * @throws ParseException 
-	 * @throws IOException 
-	 * @throws URISyntaxException 
+	 * 
+	 * @throws ParseException
+	 * @throws IOException
+	 * @throws URISyntaxException
 	 */
 	public MainFrame() throws URISyntaxException, IOException, ParseException {
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				try {
+					if (e.getKeyChar() == '1') {
+						KMeansConfiguration conf = new KMeansConfiguration(10, dataSet, new EuclideanDistance());
+						KMeansClusteringAlgorithm algo = new KMeansClusteringAlgorithm();
+						clusters = algo.clusterVectors(conf);
+					} else if (e.getKeyChar() == '2') {
+						KMedoidsConfiguration conf = new KMedoidsConfiguration(dataSet, 10, new EuclideanDistance());
+						KMedoidsClusteringAlgorithm algo = new KMedoidsClusteringAlgorithm();
+						clusters = algo.clusterVectors(conf);
+					} else if (e.getKeyChar() == '3') {
+						DbScanConfiguration conf = new DbScanConfiguration(dataSet, new EuclideanDistance(), 7, 5);
+						DbScanClusteringAlgorithm algo = new DbScanClusteringAlgorithm();
+						clusters = algo.clusterVectors(conf);
+					}
+				} catch (ClusteringProcessingException e1) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Alas, there a problem with clustering. " + e1.getMessage());
+				}
+
+				colors = new ArrayList<Color>(clusters.size());
+				for (int i = 0; i < clusters.size(); ++i) {
+					colors.add(new Color(Math.abs(r.nextInt()) % 256, Math.abs(r.nextInt()) % 256, Math.abs(r.nextInt()) % 256, 255));
+				}
+				repaint();
+			}
+		});
 		loadDataSet();
 
-		CLUSTERING_ALGORITHM_IMPLEMENTATION[0] = new KMeansClusteringAlgorithm();
-		CLUSTERING_ALGORITHM_IMPLEMENTATION[1] = new KMedoidsClusteringAlgorithm();
-		CLUSTERING_ALGORITHM_IMPLEMENTATION[2] = new DbScanClusteringAlgorithm();
-		currentClusteringAlgorithm = CLUSTERING_ALGORITHM_IMPLEMENTATION[0];
-
-		DISTANCE_FUNCTION_IMPLEMENTATION[0] = new EuclideanDistance();
-		DISTANCE_FUNCTION_IMPLEMENTATION[1] = new EuclideanSquaredDistance();
-		DISTANCE_FUNCTION_IMPLEMENTATION[2] = new ManhattenDistancePlugin();
-		DISTANCE_FUNCTION_IMPLEMENTATION[3] = new ChebyshevDistancePlugin();
-		currentDistanceFunction = DISTANCE_FUNCTION_IMPLEMENTATION[0];
-
-		optionPanes[0] = getKMeansOptionPanel();
-		optionPanes[1] = getKMedoidsOptionPanel();
-		optionPanes[2] = getDbScanOptionPanel();
-		currentOptionPane = optionPanes[0];
-
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 722, 409);
+		setBounds(100, 100, 526, 611);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		JToolBar toolBar = new JToolBar();
-		toolBar.setRollover(true);
-		contentPane.add(toolBar, BorderLayout.NORTH);
-
-		JLabel lblAlgorithm = new JLabel("Algorithm:");
-		toolBar.add(lblAlgorithm);
-
-		JComboBox comboBox = new JComboBox();
-		comboBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					return;
-				}
-				JComboBox source = (JComboBox) e.getSource();
-				int selectedIndex = source.getSelectedIndex();
-				currentClusteringAlgorithm = CLUSTERING_ALGORITHM_IMPLEMENTATION[selectedIndex];
-				contentPane.remove(currentOptionPane);
-				contentPane.add(currentOptionPane = optionPanes[selectedIndex], BorderLayout.EAST);
-				contentPane.validate();
-				currentOptionPane.repaint();
-				btnCluster.setEnabled(false);
-			}
-		});
-		comboBox.setModel(new DefaultComboBoxModel(CLUSTERING_ALGORITHM_NAME));
-		toolBar.add(comboBox);
-
-		JLabel lblDistanceFunction = new JLabel("Distance function:");
-		toolBar.add(lblDistanceFunction);
-
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					return;
-				}
-				JComboBox source = (JComboBox) e.getSource();
-				int selectedIndex = source.getSelectedIndex();
-				currentDistanceFunction = DISTANCE_FUNCTION_IMPLEMENTATION[selectedIndex];
-				btnCluster.setEnabled(false);
-			}
-		});
-		comboBox_1.setModel(new DefaultComboBoxModel(DISTANCE_FUNCTION_NAME));
-		toolBar.add(comboBox_1);
-
-		btnCluster = new JButton("Cluster");
-		btnCluster.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					final List<? extends Cluster> clusters = currentClusteringAlgorithm.clusterVectors(currentClusteringConfiguration);
-					clusteringApplication.enqueue(new Callable<Void>() {
-						public Void call() throws Exception {
-							clusteringApplication.setClusters(clusters);
-							return null;
-						}
-					});
-				} catch (ClusteringProcessingException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(MainFrame.this, e1.getMessage(), "Clustering error", JOptionPane.ERROR_MESSAGE);
-				}
-				JButton source = (JButton) e.getSource();
-				source.setEnabled(false);
-			}
-		});
-		btnCluster.setEnabled(false);
-		toolBar.add(btnCluster);
-
-		{ // option pane
-			JPanel panel = currentOptionPane;
-			contentPane.add(panel, BorderLayout.EAST);
-		}
-
-		Canvas j3dCanvas = createCanvas();
-		contentPane.add(j3dCanvas, BorderLayout.CENTER);
-	}
-
-	protected JPanel getKMeansOptionPanel() {
-		JPanel panel = new JPanel();
-		panel.setPreferredSize(new Dimension(150, 10));
-
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JLabel lblNewLabel = new JLabel("count:");
-		panel.add(lblNewLabel);
-
-		final JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(10, 0, 100000, 1));
-		panel.add(spinner);
-
-		JButton btnNewButton = new JButton("Configure");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				currentClusteringConfiguration = new KMeansConfiguration((Integer) spinner.getValue(), dataSet, currentDistanceFunction);
-				btnCluster.setEnabled(true);
-			}
-		});
-		panel.add(btnNewButton);
-		return panel;
-	}
-
-	protected JPanel getKMedoidsOptionPanel() {
-		JPanel panel = new JPanel();
-		panel.setPreferredSize(new Dimension(150, 10));
-
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JLabel lblNewLabel = new JLabel("count:");
-		panel.add(lblNewLabel);
-
-		final JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(10, 0, 100000, 1));
-		panel.add(spinner);
-
-		JButton btnNewButton = new JButton("Configure");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				currentClusteringConfiguration = new KMedoidsConfiguration(dataSet, (Integer) spinner.getValue(), currentDistanceFunction);
-				btnCluster.setEnabled(true);
-			}
-		});
-		panel.add(btnNewButton);
-		return panel;
-	}
-
-	protected JPanel getDbScanOptionPanel() {
-		JPanel panel = new JPanel();
-		panel.setPreferredSize(new Dimension(150, 10));
-
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		final JSpinner epsilonSpinner = new JSpinner();
-		final JSpinner minPtsSpinner = new JSpinner();
-
-		{
-			JLabel lblNewLabel = new JLabel("Epsilon:");
-			panel.add(lblNewLabel);
-
-			epsilonSpinner.setModel(new SpinnerNumberModel(0.1, 0, 100000, 0.01));
-			JSpinner.NumberEditor spinnerEditor = new JSpinner.NumberEditor(epsilonSpinner, "#,##0.00");
-			epsilonSpinner.setEditor(spinnerEditor);
-			panel.add(epsilonSpinner);
-		}
-
-		{
-			JLabel minPtsLabel = new JLabel("Min pts:");
-			panel.add(minPtsLabel);
-
-			minPtsSpinner.setModel(new SpinnerNumberModel(5, 1, 100000, 1));
-			panel.add(minPtsSpinner);
-		}
-
-		JButton btnNewButton = new JButton("Configure");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				currentClusteringConfiguration = new DbScanConfiguration(dataSet, currentDistanceFunction, (Double) epsilonSpinner.getValue(), (Integer) minPtsSpinner.getValue());
-				btnCluster.setEnabled(true);
-			}
-		});
-		panel.add(btnNewButton);
-		return panel;
+		contentPane.add(new DrawPanel(), BorderLayout.CENTER);
 	}
 
 	protected void loadDataSet() throws URISyntaxException, IOException, ParseException {
@@ -295,21 +128,25 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private Canvas createCanvas() {
-		AppSettings settings = new AppSettings(true);
-		settings.setResolution(800, 600);
-		settings.setFrameRate(60);
-		settings.setAudioRenderer(null);
+	private List<? extends Cluster> clusters;
+	List<Color> colors;
 
-		clusteringApplication = new ClusteringApplication(dataSet);
-		clusteringApplication.setPauseOnLostFocus(false);
-		clusteringApplication.setSettings(settings);
-		clusteringApplication.createCanvas();
-		clusteringApplication.startCanvas();
-
-		JmeCanvasContext context = (JmeCanvasContext) clusteringApplication.getContext();
-		Canvas j3dCanvas = context.getCanvas();
-
-		return j3dCanvas;
+	protected class DrawPanel extends JPanel {
+		public void paint(Graphics g) {
+			if (clusters == null) {
+				for (Vector v : dataSet) {
+					g.drawRect((int) v.getValue(0), (int) v.getValue(1), 1, 1);
+				}
+			} else {
+				int index = 0;
+				for (Cluster c : clusters) {
+					for (Vector v : c.getClusteredVectors()) {
+						g.setColor(colors.get(index));
+						g.drawRect((int) v.getValue(0), (int) v.getValue(1), 1, 1);
+					}
+					index++;
+				}
+			}
+		}
 	}
 }

@@ -3,6 +3,7 @@ package mishanesterenko.iad.lb1.core.dataset;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -16,6 +17,7 @@ public class DataSet extends AbstractDataSet {
 	private List<double[]> mDataSet = new ArrayList<double[]>();
 	private int mMinCardinality, mMaxCardinality;
 	private WeakCache<Integer, Vector> mVectorCache = new WeakCache<Integer, Vector>();
+	private WeakReference<Vector>[] mVectorCacheArray;
 
 	@Override
 	public void load(Reader readerSource) throws IOException, ParseException {
@@ -24,19 +26,18 @@ public class DataSet extends AbstractDataSet {
 
 	@Override
 	public void load(Reader readerSource, String regexSeparator, char decimalSeparator) throws IOException, ParseException {
-		getDataSet().clear();
+		List<double[]> dataSet = getDataSet();
+		dataSet.clear();
 
 		int minCardinality = Integer.MAX_VALUE, maxCardinality = Integer.MIN_VALUE;
 		BufferedReader br = new BufferedReader(readerSource);
 		DecimalFormat df = new DecimalFormat();
-		{
+		{ // decimal format symbols
 			DecimalFormatSymbols dfs = new DecimalFormatSymbols();
 			dfs.setDecimalSeparator(decimalSeparator);
-			
 			df.setDecimalFormatSymbols(dfs);
 		}
 		String line = null;
-		List<double[]> dataSet = getDataSet();
 		while ((line = br.readLine()) != null) {
 			String[] data = line.split(regexSeparator);
 			if (data.length < minCardinality) {
@@ -52,16 +53,26 @@ public class DataSet extends AbstractDataSet {
 		}
 		mMinCardinality = minCardinality;
 		mMaxCardinality = maxCardinality;
+
+		mVectorCacheArray = new WeakReference[dataSet.size()];
 	}
 
 	@Override
 	public Vector get(int mRow) {
-		Vector v = getCache().get(mRow);
-		if (v == null) {
-			v = new Vector(mRow);
-			getCache().put(mRow, v);
+		WeakReference<Vector>[] cachedVectors = getCache();
+		WeakReference<Vector> cachedVectorReference = cachedVectors[mRow];
+		Vector clusteredVector;
+		if (cachedVectorReference == null) {
+			clusteredVector = new Vector(mRow);
+			cachedVectors[mRow] = new WeakReference<Vector>(clusteredVector);
+		} else {
+			clusteredVector = cachedVectorReference.get();
+			if (clusteredVector == null) {
+				clusteredVector = new Vector(mRow);
+				cachedVectors[mRow] = new WeakReference<Vector>(clusteredVector);
+			}
 		}
-		return v;
+		return clusteredVector;
 	}
 
 	@Override
@@ -83,8 +94,8 @@ public class DataSet extends AbstractDataSet {
 		return mDataSet;
 	}
 
-	private WeakCache<Integer, Vector> getCache() {
-		return mVectorCache;
+	private WeakReference<Vector>[] getCache() {
+		return mVectorCacheArray;
 	}
 
 	public Iterator<AbstractDataSet.Vector> iterator() {

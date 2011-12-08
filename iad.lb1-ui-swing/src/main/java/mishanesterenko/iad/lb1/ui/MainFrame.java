@@ -53,6 +53,11 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
 public class MainFrame extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 667780228063658143L;
+
 	public static final String DATASET_PATH = "/dataset.dat";
 
 	private static final String[] CLUSTERING_ALGORITHM_NAME = new String[] {"K-means", "K-medoids", "Db-scan"};
@@ -284,7 +289,7 @@ public class MainFrame extends JFrame {
 		InputStream resource = MainFrame.class.getClass().getResourceAsStream(DATASET_PATH);
 		Reader dataSetReader = new BufferedReader(new InputStreamReader(resource));
 		try {
-			dataSet.load(dataSetReader, " +", '.');
+			dataSet.load(dataSetReader, "\\s+", '.');
 		} finally {
 			dataSetReader.close();
 		}

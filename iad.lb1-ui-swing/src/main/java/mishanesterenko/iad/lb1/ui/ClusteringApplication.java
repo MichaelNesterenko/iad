@@ -72,6 +72,7 @@ public class ClusteringApplication extends SimpleApplication {
 		chaseCam.setInvertVerticalAxis(true);
 		chaseCam.setMinDistance(0.15f);
 		chaseCam.setSmoothMotion(true);
+		chaseCam.setMaxDistance(10000);
 
 		setPoints(initialDataSet);
 		initialDataSet = null;

@@ -11,12 +11,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.sun.beans.WeakCache;
-
 public class DataSet extends AbstractDataSet {
 	private List<double[]> mDataSet = new ArrayList<double[]>();
 	private int mMinCardinality, mMaxCardinality;
-	private WeakCache<Integer, Vector> mVectorCache = new WeakCache<Integer, Vector>();
 	private WeakReference<Vector>[] mVectorCacheArray;
 
 	@Override

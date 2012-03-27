@@ -2,16 +2,12 @@ package mishanesterenko.iad.lb2;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.Rectangle;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.DefaultEdge;
-import org.jgraph.graph.DefaultGraphCell;
-import org.jgraph.graph.GraphConstants;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.KruskalMinimumSpanningTree;
 import org.jgrapht.ext.JGraphModelAdapter;
@@ -19,15 +15,10 @@ import org.jgrapht.graph.ListenableUndirectedWeightedGraph;
 
 import com.jgraph.layout.JGraphFacade;
 import com.jgraph.layout.graph.JGraphSimpleLayout;
-import com.jgraph.layout.organic.JGraphOrganicLayout;
-
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Rectangle2D;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -61,7 +52,7 @@ public class MainFrame extends JFrame {
 
 	private MyWeightedEdge currentEdge;
 	private JButton btnApply;
-	
+
 	/**
 	 * Create the frame.
 	 */
@@ -73,22 +64,23 @@ public class MainFrame extends JFrame {
 		setContentPane(contentPane);
 
 		graph = new ListenableUndirectedWeightedGraph<String, MyWeightedEdge>(MyWeightedEdge.class);
-		
+
 		jgraph = new JGraph(adapter = new JGraphModelAdapter<String, MyWeightedEdge>(graph));
 		jgraph.setDisconnectable(false);
 		jgraph.setConnectable(false);
 		jgraph.setMoveBeyondGraphBounds(false);
 		contentPane.add(jgraph, BorderLayout.CENTER);
 		jgraph.setEditable(false);
-		
+
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
-		
+
 		JButton btnNewButton = new JButton("Work");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				jgraph.clearSelection();
-				KruskalMinimumSpanningTree<String, MyWeightedEdge> algo = new KruskalMinimumSpanningTree<String, MyWeightedEdge>(graph);
+				KruskalMinimumSpanningTree<String, MyWeightedEdge> algo = new KruskalMinimumSpanningTree<String, MyWeightedEdge>(
+						graph);
 
 				Set<MyWeightedEdge> graphEdges = graph.edgeSet();
 				Set<MyWeightedEdge> algoEdges = algo.getEdgeSet();
@@ -99,7 +91,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		panel.add(btnNewButton);
-		
+
 		JButton btnNewButton_1 = new JButton("Reset");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			@SuppressWarnings("unchecked")
@@ -110,19 +102,19 @@ public class MainFrame extends JFrame {
 			}
 		});
 		panel.add(btnNewButton_1);
-		
+
 		JPanel panel_1 = new JPanel();
 		contentPane.add(panel_1, BorderLayout.NORTH);
-		
+
 		JLabel lblNewLabel = new JLabel("Weight:");
 		panel_1.add(lblNewLabel);
-		
+
 		textField = new JTextField();
 		textField.setEnabled(false);
 		lblNewLabel.setLabelFor(textField);
 		panel_1.add(textField);
 		textField.setColumns(10);
-		
+
 		btnApply = new JButton("Apply");
 		btnApply.setEnabled(false);
 		btnApply.addActionListener(new ActionListener() {
@@ -167,7 +159,8 @@ public class MainFrame extends JFrame {
 		pristineGraph = cloneGraph(graph, MyWeightedEdge.class);
 	}
 
-	public static <V, E> ListenableUndirectedWeightedGraph<V, E> cloneGraph(ListenableUndirectedWeightedGraph<V, E> source, Class<? extends E> edgeClass) {
+	public static <V, E> ListenableUndirectedWeightedGraph<V, E> cloneGraph(ListenableUndirectedWeightedGraph<V, E> source,
+			Class<? extends E> edgeClass) {
 		Set<E> edges = new HashSet<E>(source.edgeSet());
 		Set<V> vertices = new HashSet<V>(source.vertexSet());
 
@@ -179,7 +172,8 @@ public class MainFrame extends JFrame {
 		return dest;
 	}
 
-	public static <V, E> ListenableUndirectedWeightedGraph<V, E> copyGraph(ListenableUndirectedWeightedGraph<V, E> source, ListenableUndirectedWeightedGraph<V, E> dest) {
+	public static <V, E> ListenableUndirectedWeightedGraph<V, E> copyGraph(ListenableUndirectedWeightedGraph<V, E> source,
+			ListenableUndirectedWeightedGraph<V, E> dest) {
 		Set<E> edges = new HashSet<E>(source.edgeSet());
 		Set<V> vertices = new HashSet<V>(source.vertexSet());
 

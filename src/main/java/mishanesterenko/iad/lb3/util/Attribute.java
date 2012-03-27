@@ -34,6 +34,11 @@ public class Attribute<T> {
 		return new Value(value);
 	}
 
+	@Override
+	public String toString() {
+		return label;
+	}
+
 	public class Value {
 		private int index;
 
@@ -50,6 +55,11 @@ public class Attribute<T> {
 
 		public Attribute<T> getAttribute() {
 			return Attribute.this;
+		}
+
+		@Override
+		public String toString() {
+			return values.get(index) + " (" + Attribute.this + ")";
 		}
 	}
 }

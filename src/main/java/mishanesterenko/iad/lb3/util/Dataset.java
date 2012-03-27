@@ -73,7 +73,7 @@ public class Dataset {
 				return query.getAttribute() == getCategorialAttribute() && query.getValue() == getCategory().getValue();
 			} else {
 				for (StringAttribute.Value val : values) {
-					if (query.getAttribute() == val.getAttribute() && query.getValue().equals(query.getValue())) {
+					if (query.getAttribute() == val.getAttribute() && query.getValue().equals(val.getValue())) {
 						return true;
 					}
 				}

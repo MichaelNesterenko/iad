@@ -10,7 +10,24 @@ import mishanesterenko.iad.lb3.util.Dataset.Entry;
 import mishanesterenko.iad.lb3.util.StringAttribute;
 
 public class ID3Algorithm {
-	public DecisionTreeNode buildDecisionTree(Dataset ds) {
+	public static StringAttribute.Value classify(Entry entry, DecisionTreeNode root) {
+		if (root instanceof LeafDecisionTreeNode) {
+			return ((LeafDecisionTreeNode) root).getCategory();
+		}
+
+		StringAttribute spliitingAttr = root.getSplittingAttribute();
+		List<String> stringValues = spliitingAttr.getValues();
+		for (int i = 0; i < spliitingAttr.getValues().size(); ++i) {
+			StringAttribute.Value val = spliitingAttr.createValue(stringValues.get(i));
+			if (!entry.isEqual(val)) {
+				continue;
+			}
+			return classify(entry, root.getChildren().get(i));
+		}
+		throw new IllegalStateException("Classification problem");
+	}
+
+	public static DecisionTreeNode buildDecisionTree(Dataset ds) {
 		int[] counts = new int[ds.getCategorialAttribute().getValues().size()];
 		{
 			int index = 0;
@@ -24,7 +41,7 @@ public class ID3Algorithm {
 		return buildDecisionTreeNode(ds, new ArrayList<StringAttribute>(ds.getAttributes()), entropy);
 	}
 
-	private DecisionTreeNode buildDecisionTreeNode(Dataset ds, List<StringAttribute> attributes, double entropy) {
+	private static DecisionTreeNode buildDecisionTreeNode(Dataset ds, List<StringAttribute> attributes, double entropy) {
 		if (ds.getEntries().size() == 0) {
 			throw new IllegalStateException("data set is empty");
 		}
@@ -37,20 +54,7 @@ public class ID3Algorithm {
 		}
 
 		if (attributes.size() == 0) {
-			int maxCnt = Integer.MIN_VALUE;
-			StringAttribute.Value goodVal = null;
-			for (String catVal : ds.getCategorialAttribute().getValues()) {
-				StringAttribute.Value catValObject = ds.getCategorialAttribute().createValue(catVal);
-				int cnt = ds.count(catValObject);
-				if (cnt > maxCnt) {
-					maxCnt = cnt;
-					goodVal = catValObject;
-				}
-			}
-			if (goodVal == null) {
-				throw new IllegalStateException("categorial value is null");
-			}
-			return new LeafDecisionTreeNode(goodVal);
+			return findCommonTargetValue(ds);
 		}
 
 		StringAttribute goodAttr = null;
@@ -70,14 +74,37 @@ public class ID3Algorithm {
 		for (String val : goodAttr.getValues()) {
 			StringAttribute.Value splitValue = goodAttr.createValue(val);
 			Dataset subset = ds.subset(splitValue);
-			DecisionTreeNode child = buildDecisionTreeNode(subset, newAttributes, entropy);
+			DecisionTreeNode child = null;
+			if (subset.getEntries().size() == 0) {
+				child = findCommonTargetValue(ds);
+			} else {
+				child = buildDecisionTreeNode(subset, newAttributes, entropy);
+			}
+			child.setParent(res);
 			children.add(child);
 		}
 
 		return res;
 	}
 
-	private double calcEntropy(int[] counts) {
+	private static DecisionTreeNode findCommonTargetValue(Dataset ds) {
+		int maxCnt = Integer.MIN_VALUE;
+		StringAttribute.Value goodVal = null;
+		for (String catVal : ds.getCategorialAttribute().getValues()) {
+			StringAttribute.Value catValObject = ds.getCategorialAttribute().createValue(catVal);
+			int cnt = ds.count(catValObject);
+			if (cnt > maxCnt) {
+				maxCnt = cnt;
+				goodVal = catValObject;
+			}
+		}
+		if (goodVal == null) {
+			throw new IllegalStateException("categorial value is null");
+		}
+		return new LeafDecisionTreeNode(goodVal);
+	}
+
+	private static double calcEntropy(int[] counts) {
 		int total = 0;
 		for (int count : counts) {
 			total += count;
@@ -95,13 +122,14 @@ public class ID3Algorithm {
 		return result;
 	}
 
-	private double calcGain(Dataset ds, StringAttribute attr, double entropy) {
+	private static double calcGain(Dataset ds, StringAttribute attr, double entropy) {
 		double elementEntropy = 0;
 		for (String value : attr.getValues()) {
-			int count = ds.count(attr.createValue(value));
+			StringAttribute.Value val = attr.createValue(value);
+			int count = ds.count(val);
 
 			Map<String, Integer> distrs = new HashMap<String, Integer>();
-			Dataset subset = ds.subset(attr.createValue(value));
+			Dataset subset = ds.subset(val);
 			for (Entry subsetEntry : subset.getEntries()) {
 				String catVal = subsetEntry.getCategory().getValue();
 				Integer cnt = distrs.get(catVal);
@@ -120,7 +148,7 @@ public class ID3Algorithm {
 				}
 			}
 
-			elementEntropy = (double) count / ds.getEntries().size() * calcEntropy(counts);
+			elementEntropy += (double) count / ds.getEntries().size() * calcEntropy(counts);
 		}
 		return entropy - elementEntropy;
 	}
